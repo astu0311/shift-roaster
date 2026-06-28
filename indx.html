@@ -231,14 +231,58 @@
         .sticky-col { position: sticky; left: 0; background: #f8fafc; font-weight: 700; z-index: 5; border-right: 1px solid var(--border); }
         td.sticky-col { background: #ffffff; }
 
-        /* Mobile Viewport Daily Cards Layout Switch */
-        .mobile-matrix-feed { display: grid; gap: 8px; margin-bottom: 16px; }
-        .day-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
-        .day-card-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; }
-        .day-card-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 0.85rem; }
+        /* Mobile Swipe Slider Interface Container Styles */
+        .mobile-slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .slider-nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+        
+        .slider-btn {
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            width: auto;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+        .slider-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .slider-date-display {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .day-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+        .day-card-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+        .day-card-row:last-child { border-bottom: none; }
+        .day-card-row span:first-child { font-weight: 600; font-size: 0.9rem; }
 
         /* Badges Minimalist Styling */
-        .badge { padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; display: inline-block; text-align: center; min-width: 38px; border: 1px solid transparent; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; display: inline-block; text-align: center; min-width: 38px; border: 1px solid transparent; box-sizing: border-box; }
         .badge-a { background: var(--color-a); color: var(--text-a); border-color: var(--border-a); }
         .badge-b { background: var(--color-b); color: var(--text-b); border-color: var(--border-b); }
         .badge-c { background: var(--color-c); color: var(--text-c); border-color: var(--border-c); }
@@ -266,17 +310,19 @@
         <p>Dynamic Team Roster & Schedule Auditor</p>
     </header>
 
+    <!-- Global Layout Control Hub -->
     <div class="control-hub">
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('individual')">👤 Personal View</button>
             <button class="tab-btn" onclick="switchTab('team')">👥 Team Matrix</button>
         </div>
         <div class="date-selectors">
-            <select id="monthSelect" title="Select Month"></select>
-            <select id="yearSelect" title="Select Year"></select>
+            <select id="monthSelect" title="Select Month" onchange="resetSliderDay()"></select>
+            <select id="yearSelect" title="Select Year" onchange="resetSliderDay()"></select>
         </div>
     </div>
 
+    <!-- Collapsible Settings/Admin Drawer System -->
     <div class="accordion-panel">
         <div class="accordion-header" onclick="toggleAccordion()">
             <span>⚙️ Manage Team & System Profiles</span>
@@ -324,7 +370,9 @@
         </div>
     </div>
 
+    <!-- Active Working Viewports -->
     <div class="content-area">
+        <!-- VIEW 1: INDIVIDUAL BREAKDOWN -->
         <div id="individualPage" class="view-content active">
             <div class="summary-cards">
                 <div class="card"><h4>A Shifts</h4><div class="value" id="countA">0</div></div>
@@ -342,7 +390,9 @@
             </div>
         </div>
 
+        <!-- VIEW 2: TEAM MATRIX VIEWPORT -->
         <div id="teamPage" class="view-content">
+            <!-- Desktop Widescreen Layout -->
             <div class="table-container desktop-only-view">
                 <table>
                     <thead id="teamTableHeader"></thead>
@@ -350,13 +400,23 @@
                 </table>
             </div>
 
-            <div class="mobile-only-view mobile-matrix-feed" id="teamMobileFeed"></div>
+            <!-- Mobile Layout: Clean Horizontal Slider Box Layout Switch -->
+            <div class="mobile-only-view mobile-slider-container">
+                <div class="slider-nav-controls">
+                    <button class="slider-btn" id="prevDayBtn" onclick="navigateSlider(-1)">◀ Prev</button>
+                    <div class="slider-date-display" id="sliderDateLabel">1 May 2026</div>
+                    <button class="slider-btn" id="nextDayBtn" onclick="navigateSlider(1)">Next ▶</button>
+                </div>
+                <div class="day-card" id="sliderCardBody"></div>
+            </div>
 
+            <!-- Conflict Alert Block -->
             <div class="danger-panel" id="conflictAlertPanel" style="display:none;">
                 <h3 style="margin:0 0 6px 0; color:#b91c1c;">⚠️ Roster Conflicts Flagged</h3>
                 <div id="conflictAlertsList"></div>
             </div>
 
+            <!-- Team Summary Table -->
             <div class="table-container">
                 <table style="white-space: nowrap;">
                     <thead>
@@ -372,8 +432,8 @@
 <script>
     const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     let currentTab = 'individual';
+    let currentSliderDay = 1; // Tracking variable for mobile date slider view
 
-    // 4 Default Team Profiles explicitly synced to tracking requirements
     let defaultProfiles = [
         {
             id: "p1", name: "Astu", anchorDate: "2026-05-23",
@@ -435,6 +495,23 @@
             document.getElementById('teamPage').classList.add('active');
         }
         renderDataView();
+    }
+
+    function resetSliderDay() {
+        currentSliderDay = 1;
+        renderDataView();
+    }
+
+    function navigateSlider(direction) {
+        const selMonth = parseInt(monthSelect.value);
+        const selYear = parseInt(yearSelect.value);
+        const totalDays = new Date(selYear, selMonth + 1, 0).getDate();
+
+        currentSliderDay += direction;
+        if (currentSliderDay < 1) currentSliderDay = 1;
+        if (currentSliderDay > totalDays) currentSliderDay = totalDays;
+
+        generateTeamRoster(); // Refresh slider layout card changes
     }
 
     function renderProfilesList() {
@@ -534,8 +611,10 @@
 
         const header = document.getElementById('teamTableHeader');
         const tbody = document.getElementById('teamTableBody');
-        const mobileFeed = document.getElementById('teamMobileFeed');
+        const sliderCardBody = document.getElementById('sliderCardBody');
+        const sliderLabel = document.getElementById('sliderDateLabel');
         
+        // 1. Desktop Horizontal Spreadsheet Headers configuration
         let headerRow1 = `<tr><th class="sticky-col">Members</th>`;
         for (let d = 1; d <= totalDays; d++) {
             const currentDate = new Date(selYear, selMonth, d);
@@ -545,7 +624,6 @@
         header.innerHTML = headerRow1;
 
         tbody.innerHTML = "";
-        mobileFeed.innerHTML = "";
         let summaryMetrics = {};
         let dailyShiftAssignments = {};
 
@@ -563,6 +641,7 @@
 
         let conflictsList = [];
 
+        // 2. Map structural row allocations matrix
         profiles.forEach(p => {
             let rowHtml = `<tr><td class="sticky-col"><strong>${p.name}</strong></td>`;
             for (let d = 1; d <= totalDays; d++) {
@@ -584,23 +663,29 @@
             tbody.innerHTML += rowHtml + `</tr>`;
         });
 
-        for (let d = 1; d <= totalDays; d++) {
-            const currentDate = new Date(selYear, selMonth, d);
-            let cardHtml = `<div class="day-card">
-                <div class="day-card-header">
-                    <span>${d} ${MONTHS[selMonth]}</span>
-                    <span style="color:var(--text-muted); font-weight:normal;">${currentDate.toLocaleDateString('en-US', { weekday: 'long' })}</span>
-                </div>`;
-            
-            profiles.forEach(p => {
-                const shiftType = getShiftForDate(p, currentDate);
-                let badgeClass = `badge-${shiftType.toLowerCase()}`;
-                if (["A", "B", "C"].includes(shiftType) && dailyShiftAssignments[d][shiftType].length > 1) badgeClass += " badge-conflict";
-                cardHtml += `<div class="day-card-row"><span>${p.name}</span><span class="badge ${badgeClass}">${shiftType}</span></div>`;
-            });
-            mobileFeed.innerHTML += cardHtml + `</div>`;
-        }
+        // 3. Render Focused Horizontal Swipe Slider Day Card for Mobile
+        const currentSliderDate = new Date(selYear, selMonth, currentSliderDay);
+        sliderLabel.innerHTML = `${currentSliderDay} ${MONTHS[selMonth]} <span style="font-weight:normal; font-size:0.8rem; color:var(--text-muted);"><br>${currentSliderDate.toLocaleDateString('en-US', { weekday: 'long' })}</span>`;
+        
+        // Handle UI nav button lock constraints checks
+        document.getElementById('prevDayBtn').disabled = (currentSliderDay === 1);
+        document.getElementById('nextDayBtn').disabled = (currentSliderDay === totalDays);
 
+        let sliderCardContent = "";
+        profiles.forEach(p => {
+            const shiftType = getShiftForDate(p, currentSliderDate);
+            let badgeClass = `badge-${shiftType.toLowerCase()}`;
+            if (["A", "B", "C"].includes(shiftType) && dailyShiftAssignments[currentSliderDay][shiftType].length > 1) {
+                badgeClass += " badge-conflict";
+            }
+            sliderCardContent += `<div class="day-card-row">
+                <span>${p.name}</span>
+                <span class="badge ${badgeClass}">${shiftType}</span>
+            </div>`;
+        });
+        sliderCardBody.innerHTML = sliderCardContent;
+
+        // 4. Update Warning boxes and general roll tally logs
         const alertPanel = document.getElementById('conflictAlertPanel');
         const alertListDiv = document.getElementById('conflictAlertsList');
         if(conflictsList.length > 0) {
@@ -655,8 +740,6 @@
         document.getElementById('profileForm').reset(); toggleAccordion();
     });
 
-    monthSelect.addEventListener('change', renderDataView);
-    yearSelect.addEventListener('change', renderDataView);
     renderProfilesList();
     renderDataView();
 </script>
