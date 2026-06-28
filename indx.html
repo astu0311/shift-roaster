@@ -201,7 +201,6 @@
         th, td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85rem; white-space: nowrap; }
         th { background: #f8fafc; font-weight: 700; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border); }
 
-        /* Lock first column layout properties for team scrolling matrices */
         .sticky-col { 
             position: sticky; 
             left: 0; 
@@ -247,7 +246,6 @@
         <p>Dynamic Team Roster & Schedule Auditor</p>
     </header>
 
-    <!-- Global Roster Control Hub -->
     <div class="control-hub">
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('individual')">👤 Personal View</button>
@@ -259,7 +257,6 @@
         </div>
     </div>
 
-    <!-- Collapsible Settings/Admin Drawer System -->
     <div class="accordion-panel">
         <div class="accordion-header" onclick="toggleAccordion()">
             <span>⚙️ System Directory Configuration</span>
@@ -294,7 +291,7 @@
                 <h3>Onboard New Member</h3>
                 <form id="profileForm">
                     <div class="form-group"><input type="text" id="profName" required placeholder="Full Employee Name"></div>
-                    <div class="form-group"><input type="date" id="profAnchor" value="2026-05-23" required></div>
+                    <div class="form-group"><input type="date" id="profAnchor" value="2026-05-22" required></div>
                     <div class="form-group"><input type="text" id="profPattern" value="REST,OFF,A,A,B,B,C,C" required></div>
                     <div class="form-group">
                         <div class="rate-grid">
@@ -309,10 +306,8 @@
         </div>
     </div>
 
-    <!-- Active Presentation Workspaces -->
     <div class="content-area">
         
-        <!-- WORKSPACE 1: PERSONAL DRILLDOWN VIEW -->
         <div id="individualPage" class="view-content active">
             <div class="profile-viewer-selector">
                 <label>Select Profile to View</label>
@@ -336,22 +331,19 @@
             </div>
         </div>
 
-        <!-- WORKSPACE 2: TEAM MATRIX OVERVIEW (FULL MONTH GENERATION) -->
         <div id="teamPage" class="view-content">
             <div class="table-container">
                 <table>
-                    <thead id="teamTableHeader"></thead>
+                    <head id="teamTableHeader"></head>
                     <tbody id="teamTableBody"></tbody>
                 </table>
             </div>
 
-            <!-- Conflict Alert Block -->
             <div class="danger-panel" id="conflictAlertPanel" style="display:none;">
                 <h3 style="margin:0 0 6px 0; color:#b91c1c;">⚠️ Roster Overlap Conflicts Detected</h3>
                 <div id="conflictAlertsList"></div>
             </div>
 
-            <!-- Cumulative Team Summary Roll -->
             <div class="table-container">
                 <table>
                     <thead>
@@ -368,30 +360,49 @@
     const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     let currentTab = 'individual';
 
+    // Default Team Profiles rolled back by exactly 1 day earlier
     let defaultProfiles = [
         {
-            id: "p1", name: "Astu", anchorDate: "2026-05-23",
+            id: "p1", name: "Astu", anchorDate: "2026-05-22",
             pattern: ["REST", "OFF", "A", "A", "B", "B", "C", "C"],
             rates: { A: 300, B: 300, C: 500, REST: 0, OFF: 0 }
         },
         {
-            id: "p2", name: "Aditya Prakash Gautam", anchorDate: "2026-06-06",
+            id: "p2", name: "Aditya Prakash Gautam", anchorDate: "2026-06-05",
             pattern: ["A", "A", "B", "B", "C", "C", "REST", "OFF"],
             rates: { A: 300, B: 300, C: 500, REST: 0, OFF: 0 }
         },
         {
-            id: "p3", name: "Rana Handique", anchorDate: "2026-06-08",
+            id: "p3", name: "Rana Handique", anchorDate: "2026-06-07",
             pattern: ["A", "A", "B", "B", "C", "C", "REST", "OFF"],
             rates: { A: 300, B: 300, C: 500, REST: 0, OFF: 0 }
         },
         {
-            id: "p4", name: "Debojeet khersa", anchorDate: "2026-06-04",
+            id: "p4", name: "Debojeet khersa", anchorDate: "2026-06-03",
             pattern: ["A", "A", "B", "B", "C", "C", "REST", "OFF"],
             rates: { A: 300, B: 300, C: 500, REST: 0, OFF: 0 }
         }
     ];
 
     let profiles = JSON.parse(localStorage.getItem('shift_profiles')) || defaultProfiles;
+
+    // Automatic Session Migration: Shifts locally saved records 1 day before if not already completed
+    if (!localStorage.getItem('shifted_back_1_day_v2')) {
+        let storedProfiles = JSON.parse(localStorage.getItem('shift_profiles'));
+        if (storedProfiles) {
+            storedProfiles.forEach(p => {
+                let d = new Date(p.anchorDate);
+                d.setDate(d.getDate() - 1);
+                p.anchorDate = d.toISOString().split('T')[0];
+            });
+            profiles = storedProfiles;
+        } else {
+            profiles = defaultProfiles;
+        }
+        localStorage.setItem('shifted_back_1_day_v2', 'true');
+        localStorage.setItem('shift_profiles', JSON.stringify(profiles));
+    }
+
     let activeProfileId = localStorage.getItem('active_profile_id') || profiles[0].id;
 
     const monthSelect = document.getElementById('monthSelect');
@@ -431,7 +442,6 @@
         renderDataView();
     }
 
-    // Sync layout profile directories select options dropdown elements
     function syncProfileDropdowns() {
         const personalSelect = document.getElementById('personalProfileSelect');
         const editSelect = document.getElementById('editProfileSelect');
@@ -527,7 +537,6 @@
         const header = document.getElementById('teamTableHeader');
         const tbody = document.getElementById('teamTableBody');
         
-        // Build Horizontal Spreadsheet Date Columns for the WHOLE month
         let headerRow1 = `<tr><th class="sticky-col">Members</th>`;
         for (let d = 1; d <= totalDays; d++) {
             const currentDate = new Date(selYear, selMonth, d);
@@ -554,7 +563,6 @@
 
         let conflictsList = [];
 
-        // Build continuous timeline spreadsheet rows for all profiles across the complete month
         profiles.forEach(p => {
             let rowHtml = `<tr><td class="sticky-col"><strong>${p.name}</strong></td>`;
             for (let d = 1; d <= totalDays; d++) {
@@ -576,7 +584,6 @@
             tbody.innerHTML += rowHtml + `</tr>`;
         });
 
-        // Warnings Block visibility handling rules
         const alertPanel = document.getElementById('conflictAlertPanel');
         const alertListDiv = document.getElementById('conflictAlertsList');
         if(conflictsList.length > 0) {
@@ -584,7 +591,6 @@
             alertListDiv.innerHTML = conflictsList.map(c => `<div style="padding:4px 0;">${c}</div>`).join('');
         } else { alertPanel.style.display = "none"; }
 
-        // Global Payroll Total Generation updates
         const summaryBody = document.getElementById('teamSummaryBody');
         summaryBody.innerHTML = "";
         Object.keys(summaryMetrics).forEach(id => {
@@ -642,7 +648,6 @@
     monthSelect.addEventListener('change', renderDataView);
     yearSelect.addEventListener('change', renderDataView);
     
-    // Initial Setup Bootstrapping sequence
     syncProfileDropdowns();
     renderDataView();
 </script>
