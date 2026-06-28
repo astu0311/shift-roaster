@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Shift Roster & Conflict Tracker</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            
+            /* Shift Colors */
+            --color-a: #dbeafe; --text-a: #1e40af;
+            --color-b: #feeed2; --text-b: #854d0e;
+            --color-c: #fae8ff; --text-c: #86198f;
+            --color-off: #f1f5f9; --text-off: #475569;
+            --color-conflict: #fee2e2; --text-conflict: #991b1b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @media(min-width: 600px) {
+            body { padding: 20px; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 { margin: 0 0 5px 0; font-size: 1.8rem; color: #0f172a; }
+        header p { margin: 0; color: #64748b; font-size: 0.95rem; }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: none;
+            color: #64748b;
+            border: none;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            width: auto;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Global Controls Bar */
+        .display-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        /* Layout Architecture */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 992px) {
+            .layout {
+                grid-template-columns: 280px 1fr;
+            }
+        }
+
+        /* Sidebar Panels */
+        .panel {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        .panel h2 { font-size: 1rem; margin-top: 0; margin-bottom: 12px; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px;}
+
+        /* Conflict Alert Banner styles */
+        .panel.danger-panel {
+            border-left: 5px solid #ef4444;
+            background-color: #fef2f2;
+        }
+        .conflict-item {
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid #fee2e2;
+            color: #991b1b;
+        }
+        .conflict-item:last-child { border-bottom: none; }
+
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #475569; }
+
+        input, select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #fff;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: var(--primary-hover); }
+
+        .profile-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: #f1f5f9;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .profile-list-item.active { background: var(--primary); color: white; }
+
+        .delete-btn {
+            background: none;
+            color: #ef4444;
+            border: none;
+            width: auto;
+            padding: 0 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .profile-list-item.active .delete-btn { color: #fca5a5; }
+
+        /* Workspace Visibility Rules */
+        .view-content { display: none; }
+        .view-content.active { display: block; }
+
+        /* Summary Cards System */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        @media (min-width: 480px) {
+            .summary-cards { grid-template-columns: repeat(4, 1fr); }
+        }
+        .card { background: var(--card-bg); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+        .card h3 { margin: 0 0 3px 0; font-size: 11px; color: #64748b; text-transform: uppercase; }
+        .card .value { font-size: 1.15rem; font-weight: bold; }
+        .card.total-earning { border-left: 4px solid var(--primary); }
+
+        /* Advanced Scrollable Table Containers */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            max-height: 550px;
+            overflow: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; white-space: nowrap; }
+        th { background-color: #f1f5f9; font-weight: 600; color: #475569; position: sticky; top: 0; z-index: 10; }
+
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            background: #f1f5f9;
+            font-weight: 600;
+            z-index: 5;
+        }
+        td.sticky-col { background: #fff; border-right: 2px solid var(--border); }
+
+        /* Badges Styling */
+        .badge {
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            display: inline-block;
+            text-align: center;
+            min-width: 35px;
+        }
+        .badge-a { background: var(--color-a); color: var(--text-a); }
+        .badge-b { background: var(--color-b); color: var(--text-b); }
+        .badge-c { background: var(--color-c); color: var(--text-c); }
+        .badge-rest { background: var(--color-off); color: var(--text-off); border: 1px dashed #cbd5e1; }
+        .badge-off { background: var(--color-off); color: var(--text-off); font-weight: 700; }
+        .badge-conflict { background: var(--color-conflict) !important; color: var(--text-conflict) !important; border: 1px solid #fca5a5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Shift Roster Workspace</h1>
+        <p>Track personal earnings and monitor team schedules with overlap conflict protection.</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('individual')">👤 Personal View</button>
+        <button class="tab-btn" onclick="switchTab('team')">👥 Team Matrix View</button>
+    </div>
+
+    <div class="display-controls">
+        <select id="monthSelect" style="flex:2;"></select>
+        <select id="yearSelect" style="flex:1;"></select>
+    </div>
+
+    <div class="layout">
+        <div class="sidebar">
+            <div class="panel">
+                <h2>Profiles</h2>
+                <div id="profileList"></div>
+            </div>
+
+            <div class="panel" id="editPanel" style="display:none;">
+                <h2>Edit Member: <span id="editingTargetName"></span></h2>
+                <form id="editForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Anchor Date</label>
+                        <input type="date" id="editAnchor" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pattern Sequence</label>
+                        <input type="text" id="editPattern" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Shift Allowance Rates (₹)</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="number" id="editRateA" placeholder="A">
+                            <input type="number" id="editRateB" placeholder="B">
+                            <input type="number" id="editRateC" placeholder="C">
+                        </div>
+                    </div>
+                    <button type="submit">Save Updates</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Add New Member</h2>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profName" required placeholder="e.g., Rohit">
+                    </div>
+                    <div class="form-group">
+                        <label>Anchor Date</label>
+                        <input type="date" id="profAnchor" value="2026-05-23" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pattern Sequence (Comma Sep.)</label>
+                        <input type="text" id="profPattern" value="REST,OFF,A,A,B,B,C,C" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Shift Allowance Rates (₹)</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="number" id="rateA" value="300" placeholder="A">
+                            <input type="number" id="rateB" value="300" placeholder="B">
+                            <input type="number" id="rateC" value="500" placeholder="C">
+                        </div>
+                    </div>
+                    <button type="submit">Add to Team</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div id="individualPage" class="view-content active">
+                <div class="summary-cards">
+                    <div class="card"><h3>A Shifts</h3><div class="value" id="countA">0</div></div>
+                    <div class="card"><h3>B Shifts</h3><div class="value" id="countB">0</div></div>
+                    <div class="card"><h3>C Shifts</h3><div class="value" id="countC">0</div></div>
+                    <div class="card total-earning"><h3>Allowance</h3><div class="value" id="totalAllowance">₹0</div></div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Date</th><th>Day</th><th>Shift Status</th><th>Allowance</th></tr>
+                        </thead>
+                        <tbody id="rosterBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="teamPage" class="view-content">
+                <div class="table-container">
+                    <table>
+                        <thead id="teamTableHeader"></thead>
+                        <tbody id="teamTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel danger-panel" id="conflictAlertPanel" style="display:none;">
+                    <h2 style="color:#b91c1c; border-bottom: 2px solid #fee2e2;">⚠️ Double-Booking Shift Conflicts Detected</h2>
+                    <div id="conflictAlertsList"></div>
+                </div>
+
+                <div class="panel" style="margin-top:15px; padding: 10px;">
+                    <h2>Monthly Summary & Payroll Roll</h2>
+                    <div class="table-container" style="max-height:none; border:none; margin-bottom:0;">
+                        <table>
+                            <thead>
+                                <tr><th>Member Name</th><th>A Shifts</th><th>B Shifts</th><th>C Shifts</th><th>Total Allowance</th></tr>
+                            </thead>
+                            <tbody id="teamSummaryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    let currentTab = 'individual';
+
+    let defaultProfiles = [
+        {
+            id: "p1", name: "Astu", anchorDate: "2026-05-23", // Exact unadjusted anchor date
+            pattern: ["REST", "OFF", "A", "A", "B", "B", "C", "C"],
+            rates: { A: 300, B: 300, C: 500, REST: 0, OFF: 0 }
+        }
+    ];
+
+    let profiles = JSON.parse(localStorage.getItem('shift_profiles')) || defaultProfiles;
+    let activeProfileId = localStorage.getItem('active_profile_id') || profiles[0].id;
+
+    const monthSelect = document.getElementById('monthSelect');
+    const yearSelect = document.getElementById('yearSelect');
+    MONTHS.forEach((m, idx) => {
+        let opt = new Option(m, idx);
+        if(idx === 4) opt.selected = true; 
+        monthSelect.add(opt);
+    });
+    for(let y = 2026; y <= 2030; y++) { yearSelect.add(new Option(y, y)); }
+
+    function saveState() {
+        localStorage.setItem('shift_profiles', JSON.stringify(profiles));
+        localStorage.setItem('active_profile_id', activeProfileId);
+    }
+
+    function switchTab(tabName) {
+        currentTab = tabName;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+        
+        if(tabName === 'individual') {
+            document.querySelector('[onclick="switchTab(\'individual\')"]').classList.add('active');
+            document.getElementById('individualPage').classList.add('active');
+        } else {
+            document.querySelector('[onclick="switchTab(\'team\')"]').classList.add('active');
+            document.getElementById('teamPage').classList.add('active');
+        }
+        renderDataView();
+    }
+
+    function renderProfilesList() {
+        const listDiv = document.getElementById('profileList');
+        listDiv.innerHTML = "";
+        profiles.forEach(p => {
+            const row = document.createElement('div');
+            row.className = `profile-list-item ${p.id === activeProfileId ? 'active' : ''}`;
+            row.innerHTML = `<span>${p.name}</span>`;
+            
+            if(profiles.length > 1) {
+                const delBtn = document.createElement('button');
+                delBtn.className = 'delete-btn'; delBtn.innerText = '✕';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    profiles = profiles.filter(item => item.id !== p.id);
+                    if(activeProfileId === p.id) activeProfileId = profiles[0].id;
+                    saveState(); renderProfilesList(); populateEditPanel(); renderDataView();
+                };
+                row.appendChild(delBtn);
+            }
+            row.onclick = () => { activeProfileId = p.id; saveState(); renderProfilesList(); populateEditPanel(); renderDataView(); };
+            listDiv.appendChild(row);
+        });
+        populateEditPanel();
+    }
+
+    function populateEditPanel() {
+        const currentProf = profiles.find(p => p.id === activeProfileId);
+        if(!currentProf) {
+            document.getElementById('editPanel').style.display = 'none';
+            return;
+        }
+        document.getElementById('editPanel').style.display = 'block';
+        document.getElementById('editingTargetName').innerText = currentProf.name;
+        document.getElementById('editName').value = currentProf.name;
+        document.getElementById('editAnchor').value = currentProf.anchorDate;
+        document.getElementById('editPattern').value = currentProf.pattern.join(',');
+        document.getElementById('editRateA').value = currentProf.rates.A;
+        document.getElementById('editRateB').value = currentProf.rates.B;
+        document.getElementById('editRateC').value = currentProf.rates.C;
+    }
+
+    function getShiftForDate(profile, dateObj) {
+        const startAnchor = new Date(profile.anchorDate);
+        const diffTime = dateObj.getTime() - startAnchor.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        let patternLen = profile.pattern.length;
+        let patternIndex = diffDays % patternLen;
+        if (patternIndex < 0) patternIndex += patternLen;
+
+        const rawShift = profile.pattern[patternIndex].trim().toUpperCase();
+        return (['A','B','C','REST','OFF'].includes(rawShift)) ? rawShift : 'OFF';
+    }
+
+    function renderDataView() {
+        if (currentTab === 'individual') {
+            generateIndividualRoster();
+        } else {
+            generateTeamRoster();
+        }
+    }
+
+    function generateIndividualRoster() {
+        const currentProf = profiles.find(p => p.id === activeProfileId) || profiles[0];
+        const selMonth = parseInt(monthSelect.value);
+        const selYear = parseInt(yearSelect.value);
+        const tbody = document.getElementById('rosterBody');
+        tbody.innerHTML = "";
+
+        let counts = { A: 0, B: 0, C: 0, REST: 0, OFF: 0 };
+        let totalEarnings = 0;
+        const totalDays = new Date(selYear, selMonth + 1, 0).getDate();
+
+        for (let d = 1; d <= totalDays; d++) {
+            const currentDate = new Date(selYear, selMonth, d);
+            const shiftType = getShiftForDate(currentProf, currentDate);
+            const allowance = currentProf.rates[shiftType] || 0;
+
+            counts[shiftType]++;
+            totalEarnings += allowance;
+
+            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
+            let badgeClass = `badge-${shiftType.toLowerCase()}`;
+            let displayShift = (shiftType === "REST" || shiftType === "OFF") ? shiftType : `${shiftType} Shift`;
+
+            tbody.innerHTML += `<tr>
+                <td><strong>${d} ${MONTHS[selMonth]}</strong></td>
+                <td>${dayName}</td>
+                <td><span class="badge ${badgeClass}">${displayShift}</span></td>
+                <td>${allowance > 0 ? '₹' + allowance : '—'}</td>
+            </tr>`;
+        }
+        document.getElementById('countA').innerText = counts['A'];
+        document.getElementById('countB').innerText = counts['B'];
+        document.getElementById('countC').innerText = counts['C'];
+        document.getElementById('totalAllowance').innerText = `₹${totalEarnings.toLocaleString('en-IN')}`;
+    }
+
+    function generateTeamRoster() {
+        const selMonth = parseInt(monthSelect.value);
+        const selYear = parseInt(yearSelect.value);
+        const totalDays = new Date(selYear, selMonth + 1, 0).getDate();
+
+        const header = document.getElementById('teamTableHeader');
+        const tbody = document.getElementById('teamTableBody');
+        
+        let headerRow1 = `<tr><th class="sticky-col" style="top: 0; z-index: 15;">Team Members</th>`;
+        for (let d = 1; d <= totalDays; d++) {
+            const currentDate = new Date(selYear, selMonth, d);
+            const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+            headerRow1 += `<th style="text-align:center;">${d}<br><small>${dayName}</small></th>`;
+        }
+        headerRow1 += `</tr>`;
+        header.innerHTML = headerRow1;
+
+        tbody.innerHTML = "";
+        let summaryMetrics = {};
+        let dailyShiftAssignments = {};
+
+        profiles.forEach(p => {
+            summaryMetrics[p.id] = { name: p.name, A: 0, B: 0, C: 0, totalPay: 0 };
+        });
+
+        for (let d = 1; d <= totalDays; d++) {
+            dailyShiftAssignments[d] = { "A": [], "B": [], "C": [] };
+            const currentDate = new Date(selYear, selMonth, d);
+            
+            profiles.forEach(p => {
+                const shiftType = getShiftForDate(p, currentDate);
+                if (["A", "B", "C"].includes(shiftType)) {
+                    dailyShiftAssignments[d][shiftType].push(p.name);
+                }
+            });
+        }
+
+        let conflictsList = [];
+
+        profiles.forEach(p => {
+            let rowHtml = `<tr><td class="sticky-col"><strong>${p.name}</strong></td>`;
+            
+            for (let d = 1; d <= totalDays; d++) {
+                const currentDate = new Date(selYear, selMonth, d);
+                const shiftType = getShiftForDate(p, currentDate);
+                const allowance = p.rates[shiftType] || 0;
+                
+                summaryMetrics[p.id][shiftType]++;
+                summaryMetrics[p.id].totalPay += allowance;
+
+                let badgeClass = `badge-${shiftType.toLowerCase()}`;
+                
+                if (["A", "B", "C"].includes(shiftType) && dailyShiftAssignments[d][shiftType].length > 1) {
+                    badgeClass += " badge-conflict";
+                    
+                    let conflictDesc = `<strong>${d} ${MONTHS[selMonth]}</strong> — <strong>Shift ${shiftType}</strong> is assigned to multiple people simultaneously: ${dailyShiftAssignments[d][shiftType].join(', ')}`;
+                    if(!conflictsList.includes(conflictDesc)) {
+                        conflictsList.push(conflictDesc);
+                    }
+                }
+
+                rowHtml += `<td style="text-align:center;"><span class="badge ${badgeClass}">${shiftType}</span></td>`;
+            }
+            rowHtml += `</tr>`;
+            tbody.innerHTML += rowHtml;
+        });
+
+        const alertPanel = document.getElementById('conflictAlertPanel');
+        const alertListDiv = document.getElementById('conflictAlertsList');
+        if(conflictsList.length > 0) {
+            alertPanel.style.display = "block";
+            alertListDiv.innerHTML = conflictsList.map(c => `<div class="conflict-item">${c}</div>`).join('');
+        } else {
+            alertPanel.style.display = "none";
+        }
+
+        const summaryBody = document.getElementById('teamSummaryBody');
+        summaryBody.innerHTML = "";
+        Object.keys(summaryMetrics).forEach(id => {
+            const m = summaryMetrics[id];
+            summaryBody.innerHTML += `<tr>
+                <td><strong>${m.name}</strong></td>
+                <td>${m.A} days</td>
+                <td>${m.B} days</td>
+                <td>${m.C} days</td>
+                <td><strong>₹${m.totalPay.toLocaleString('en-IN')}</strong></td>
+            </tr>`;
+        });
+    }
+
+    document.getElementById('editForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const currentProf = profiles.find(p => p.id === activeProfileId);
+        if(!currentProf) return;
+
+        currentProf.name = document.getElementById('editName').value.trim();
+        currentProf.anchorDate = document.getElementById('editAnchor').value; // Pure exact input
+        currentProf.pattern = document.getElementById('editPattern').value.split(',').map(s => s.trim().toUpperCase());
+        currentProf.rates.A = parseInt(document.getElementById('editRateA').value) || 0;
+        currentProf.rates.B = parseInt(document.getElementById('editRateB').value) || 0;
+        currentProf.rates.C = parseInt(document.getElementById('editRateC').value) || 0;
+
+        saveState(); renderProfilesList(); renderDataView();
+    });
+
+    document.getElementById('profileForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const patternArr = document.getElementById('profPattern').value.split(',').map(s => s.trim().toUpperCase());
+        
+        const newProfile = {
+            id: 'p_' + Date.now(),
+            name: document.getElementById('profName').value.trim(),
+            anchorDate: document.getElementById('profAnchor').value, // Pure exact input
+            pattern: patternArr,
+            rates: {
+                A: parseInt(document.getElementById('rateA').value) || 0,
+                B: parseInt(document.getElementById('rateB').value) || 0,
+                C: parseInt(document.getElementById('rateC').value) || 0,
+                REST: 0, OFF: 0
+            }
+        };
+
+        profiles.push(newProfile);
+        activeProfileId = newProfile.id;
+        saveState(); renderProfilesList(); renderDataView();
+        document.getElementById('profileForm').reset();
+    });
+
+    monthSelect.addEventListener('change', renderDataView);
+    yearSelect.addEventListener('change', renderDataView);
+
+    renderProfilesList();
+    renderDataView();
+</script>
+</body>
+</html>
