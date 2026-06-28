@@ -54,7 +54,7 @@
         header h1 { margin: 0 0 4px 0; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.025em; }
         header p { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
 
-        /* Unified Top Control Hub */
+        /* Global Control Hub */
         .control-hub {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -99,7 +99,7 @@
             gap: 10px;
         }
 
-        /* Collapsible Administration Panel Accordion */
+        /* Collapsible Administration Drawer Panel Accordion */
         .accordion-panel {
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -140,7 +140,7 @@
         .sub-panel:last-child { margin-bottom: 0; }
         .sub-panel h3 { margin: 0 0 10px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
 
-        /* Form Components */
+        /* Form Layout Elements */
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); }
         
@@ -173,36 +173,7 @@
             cursor: pointer;
         }
 
-        /* Profile Selection Pills */
-        .profile-pills {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            margin-bottom: 10px;
-        }
-        .pill {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .pill.active {
-            background: #eff6ff;
-            color: var(--primary);
-            border-color: var(--border-a);
-        }
-        .pill .pill-del { color: var(--text-muted); font-weight: normal; margin-left: 4px; }
-        .pill .pill-del:hover { color: #ef4444; }
-
-        /* Summary Cards Block */
+        /* Summary Dashboard Metrics */
         .summary-cards {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -213,75 +184,36 @@
         .card h4 { margin: 0 0 2px 0; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
         .card .value { font-size: 1.1rem; font-weight: 700; }
 
-        /* Tables & Matrix Viewports */
+        /* Spread Tables & Horizontal Scrolling Matrix Containers */
         .table-container {
             background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid var(--border);
-            max-height: 450px;
+            max-height: 480px;
             overflow: auto;
             width: 100%;
             margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+            -webkit-overflow-scrolling: touch;
         }
 
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         th, td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.85rem; white-space: nowrap; }
         th { background: #f8fafc; font-weight: 700; position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border); }
 
-        .sticky-col { position: sticky; left: 0; background: #f8fafc; font-weight: 700; z-index: 5; border-right: 1px solid var(--border); }
+        /* Lock first column layout properties for team scrolling matrices */
+        .sticky-col { 
+            position: sticky; 
+            left: 0; 
+            background: #f8fafc; 
+            font-weight: 700; 
+            z-index: 6; 
+            border-right: 2px solid var(--border); 
+        }
         td.sticky-col { background: #ffffff; }
+        tr:hover td.sticky-col { background: #f8fafc; }
 
-        /* Mobile Swipe Slider Interface Container Styles */
-        .mobile-slider-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .slider-nav-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 12px;
-        }
-        
-        .slider-btn {
-            background: #f1f5f9;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            width: auto;
-            padding: 6px 14px;
-            font-size: 0.85rem;
-            border-radius: 6px;
-        }
-        .slider-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        .slider-date-display {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-main);
-            text-align: center;
-        }
-
-        .day-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
-            padding: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box;
-        }
-        .day-card-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
-        .day-card-row:last-child { border-bottom: none; }
-        .day-card-row span:first-child { font-weight: 600; font-size: 0.9rem; }
-
-        /* Badges Minimalist Styling */
+        /* Shift Badges Minimalist Look */
         .badge { padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; display: inline-block; text-align: center; min-width: 38px; border: 1px solid transparent; box-sizing: border-box; }
         .badge-a { background: var(--color-a); color: var(--text-a); border-color: var(--border-a); }
         .badge-b { background: var(--color-b); color: var(--text-b); border-color: var(--border-b); }
@@ -291,15 +223,20 @@
         .badge-conflict { background: var(--color-conflict) !important; color: var(--text-conflict) !important; border-color: var(--border-conflict) !important; }
 
         .danger-panel { border-left: 4px solid #ef4444; background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-conflict); }
+        .view-content { display: none; }
+        .view-content.active { display: block; }
 
-        .desktop-only-view { display: none; }
-        .mobile-only-view { display: block; }
-
-        @media(min-width: 768px) {
-            .desktop-only-view { display: block; }
-            .mobile-only-view { display: none; }
-            .summary-cards { grid-template-columns: repeat(4, 1fr); }
+        .profile-viewer-selector {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
+        .profile-viewer-selector label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -310,33 +247,32 @@
         <p>Dynamic Team Roster & Schedule Auditor</p>
     </header>
 
-    <!-- Global Layout Control Hub -->
+    <!-- Global Roster Control Hub -->
     <div class="control-hub">
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('individual')">👤 Personal View</button>
-            <button class="tab-btn" onclick="switchTab('team')">👥 Team Matrix</button>
+            <button class="tab-btn" onclick="switchTab('team')">👥 Team Matrix View</button>
         </div>
         <div class="date-selectors">
-            <select id="monthSelect" title="Select Month" onchange="resetSliderDay()"></select>
-            <select id="yearSelect" title="Select Year" onchange="resetSliderDay()"></select>
+            <select id="monthSelect" title="Select Month"></select>
+            <select id="yearSelect" title="Select Year"></select>
         </div>
     </div>
 
     <!-- Collapsible Settings/Admin Drawer System -->
     <div class="accordion-panel">
         <div class="accordion-header" onclick="toggleAccordion()">
-            <span>⚙️ Manage Team & System Profiles</span>
+            <span>⚙️ System Directory Configuration</span>
             <span id="accordionArrow">▼</span>
         </div>
         <div class="accordion-content" id="accordionContent">
-            <div class="sub-panel">
-                <h3>Directory Selection</h3>
-                <div class="profile-pills" id="profilePillsContainer"></div>
-            </div>
-
-            <div class="sub-panel" id="editPanel" style="display:none;">
-                <h3>Modify Active Profile</h3>
+            <div class="sub-panel" id="editPanel">
+                <h3>Modify Onboarded Profiles</h3>
                 <form id="editForm">
+                    <div class="form-group">
+                        <label>Target Employee</label>
+                        <select id="editProfileSelect" onchange="populateEditForm()"></select>
+                    </div>
                     <div class="form-group"><input type="text" id="editName" placeholder="Full Name" required></div>
                     <div class="form-group"><input type="date" id="editAnchor" required></div>
                     <div class="form-group"><input type="text" id="editPattern" placeholder="Sequence (e.g. REST,OFF,A,A)" required></div>
@@ -347,7 +283,10 @@
                             <input type="number" id="editRateC" placeholder="C Rate">
                         </div>
                     </div>
-                    <button type="submit">Save Updates</button>
+                    <div style="display:flex; gap:8px;">
+                        <button type="submit" style="flex:2;">Save Updates</button>
+                        <button type="button" onclick="deleteActiveProfile()" style="flex:1; background:#ef4444;">Remove</button>
+                    </div>
                 </form>
             </div>
 
@@ -370,16 +309,23 @@
         </div>
     </div>
 
-    <!-- Active Working Viewports -->
+    <!-- Active Presentation Workspaces -->
     <div class="content-area">
-        <!-- VIEW 1: INDIVIDUAL BREAKDOWN -->
+        
+        <!-- WORKSPACE 1: PERSONAL DRILLDOWN VIEW -->
         <div id="individualPage" class="view-content active">
+            <div class="profile-viewer-selector">
+                <label>Select Profile to View</label>
+                <select id="personalProfileSelect" onchange="updateActiveViewProfile()"></select>
+            </div>
+            
             <div class="summary-cards">
                 <div class="card"><h4>A Shifts</h4><div class="value" id="countA">0</div></div>
                 <div class="card"><h4>B Shifts</h4><div class="value" id="countB">0</div></div>
                 <div class="card"><h4>C Shifts</h4><div class="value" id="countC">0</div></div>
                 <div class="card" style="border-left: 3px solid var(--primary);"><h4>Allowance</h4><div class="value" id="totalAllowance">₹0</div></div>
             </div>
+            
             <div class="table-container">
                 <table>
                     <thead>
@@ -390,37 +336,26 @@
             </div>
         </div>
 
-        <!-- VIEW 2: TEAM MATRIX VIEWPORT -->
+        <!-- WORKSPACE 2: TEAM MATRIX OVERVIEW (FULL MONTH GENERATION) -->
         <div id="teamPage" class="view-content">
-            <!-- Desktop Widescreen Layout -->
-            <div class="table-container desktop-only-view">
+            <div class="table-container">
                 <table>
                     <thead id="teamTableHeader"></thead>
                     <tbody id="teamTableBody"></tbody>
                 </table>
             </div>
 
-            <!-- Mobile Layout: Clean Horizontal Slider Box Layout Switch -->
-            <div class="mobile-only-view mobile-slider-container">
-                <div class="slider-nav-controls">
-                    <button class="slider-btn" id="prevDayBtn" onclick="navigateSlider(-1)">◀ Prev</button>
-                    <div class="slider-date-display" id="sliderDateLabel">1 May 2026</div>
-                    <button class="slider-btn" id="nextDayBtn" onclick="navigateSlider(1)">Next ▶</button>
-                </div>
-                <div class="day-card" id="sliderCardBody"></div>
-            </div>
-
             <!-- Conflict Alert Block -->
             <div class="danger-panel" id="conflictAlertPanel" style="display:none;">
-                <h3 style="margin:0 0 6px 0; color:#b91c1c;">⚠️ Roster Conflicts Flagged</h3>
+                <h3 style="margin:0 0 6px 0; color:#b91c1c;">⚠️ Roster Overlap Conflicts Detected</h3>
                 <div id="conflictAlertsList"></div>
             </div>
 
-            <!-- Team Summary Table -->
+            <!-- Cumulative Team Summary Roll -->
             <div class="table-container">
-                <table style="white-space: nowrap;">
+                <table>
                     <thead>
-                        <tr><th>Employee</th><th>A Shifts</th><th>B Shifts</th><th>C Shifts</th><th>Gross Payout</th></tr>
+                        <tr><th>Employee Directory</th><th>A Shifts</th><th>B Shifts</th><th>C Shifts</th><th>Gross Monthly Payout</th></tr>
                     </thead>
                     <tbody id="teamSummaryBody"></tbody>
                 </table>
@@ -432,7 +367,6 @@
 <script>
     const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     let currentTab = 'individual';
-    let currentSliderDay = 1; // Tracking variable for mobile date slider view
 
     let defaultProfiles = [
         {
@@ -465,7 +399,7 @@
     
     MONTHS.forEach((m, idx) => {
         let opt = new Option(m, idx);
-        if(idx === 4) opt.selected = true; // May 2026 default
+        if(idx === 4) opt.selected = true; // May 2026 Default Viewport mapping
         monthSelect.add(opt);
     });
     for(let y = 2026; y <= 2030; y++) { yearSelect.add(new Option(y, y)); }
@@ -497,53 +431,34 @@
         renderDataView();
     }
 
-    function resetSliderDay() {
-        currentSliderDay = 1;
-        renderDataView();
-    }
-
-    function navigateSlider(direction) {
-        const selMonth = parseInt(monthSelect.value);
-        const selYear = parseInt(yearSelect.value);
-        const totalDays = new Date(selYear, selMonth + 1, 0).getDate();
-
-        currentSliderDay += direction;
-        if (currentSliderDay < 1) currentSliderDay = 1;
-        if (currentSliderDay > totalDays) currentSliderDay = totalDays;
-
-        generateTeamRoster(); // Refresh slider layout card changes
-    }
-
-    function renderProfilesList() {
-        const container = document.getElementById('profilePillsContainer');
-        container.innerHTML = "";
+    // Sync layout profile directories select options dropdown elements
+    function syncProfileDropdowns() {
+        const personalSelect = document.getElementById('personalProfileSelect');
+        const editSelect = document.getElementById('editProfileSelect');
+        
+        personalSelect.innerHTML = "";
+        editSelect.innerHTML = "";
+        
         profiles.forEach(p => {
-            const pill = document.createElement('div');
-            pill.className = `pill ${p.id === activeProfileId ? 'active' : ''}`;
-            pill.innerHTML = `<span>${p.name}</span>`;
-            
-            if(profiles.length > 1) {
-                const del = document.createElement('span');
-                del.className = 'pill-del';
-                del.innerHTML = '✕';
-                del.onclick = (e) => {
-                    e.stopPropagation();
-                    profiles = profiles.filter(item => item.id !== p.id);
-                    if(activeProfileId === p.id) activeProfileId = profiles[0].id;
-                    saveState(); renderProfilesList(); renderDataView();
-                };
-                pill.appendChild(del);
-            }
-            pill.onclick = () => { activeProfileId = p.id; saveState(); renderProfilesList(); populateEditPanel(); renderDataView(); };
-            container.appendChild(pill);
+            personalSelect.add(new Option(p.name, p.id));
+            editSelect.add(new Option(p.name, p.id));
         });
-        populateEditPanel();
+        
+        personalSelect.value = activeProfileId;
+        populateEditForm();
     }
 
-    function populateEditPanel() {
-        const currentProf = profiles.find(p => p.id === activeProfileId);
-        if(!currentProf) { document.getElementById('editPanel').style.display = 'none'; return; }
-        document.getElementById('editPanel').style.display = 'block';
+    function updateActiveViewProfile() {
+        activeProfileId = document.getElementById('personalProfileSelect').value;
+        saveState();
+        generateIndividualRoster();
+    }
+
+    function populateEditForm() {
+        const targetId = document.getElementById('editProfileSelect').value;
+        const currentProf = profiles.find(p => p.id === targetId);
+        if(!currentProf) return;
+        
         document.getElementById('editName').value = currentProf.name;
         document.getElementById('editAnchor').value = currentProf.anchorDate;
         document.getElementById('editPattern').value = currentProf.pattern.join(',');
@@ -611,10 +526,8 @@
 
         const header = document.getElementById('teamTableHeader');
         const tbody = document.getElementById('teamTableBody');
-        const sliderCardBody = document.getElementById('sliderCardBody');
-        const sliderLabel = document.getElementById('sliderDateLabel');
         
-        // 1. Desktop Horizontal Spreadsheet Headers configuration
+        // Build Horizontal Spreadsheet Date Columns for the WHOLE month
         let headerRow1 = `<tr><th class="sticky-col">Members</th>`;
         for (let d = 1; d <= totalDays; d++) {
             const currentDate = new Date(selYear, selMonth, d);
@@ -641,7 +554,7 @@
 
         let conflictsList = [];
 
-        // 2. Map structural row allocations matrix
+        // Build continuous timeline spreadsheet rows for all profiles across the complete month
         profiles.forEach(p => {
             let rowHtml = `<tr><td class="sticky-col"><strong>${p.name}</strong></td>`;
             for (let d = 1; d <= totalDays; d++) {
@@ -663,29 +576,7 @@
             tbody.innerHTML += rowHtml + `</tr>`;
         });
 
-        // 3. Render Focused Horizontal Swipe Slider Day Card for Mobile
-        const currentSliderDate = new Date(selYear, selMonth, currentSliderDay);
-        sliderLabel.innerHTML = `${currentSliderDay} ${MONTHS[selMonth]} <span style="font-weight:normal; font-size:0.8rem; color:var(--text-muted);"><br>${currentSliderDate.toLocaleDateString('en-US', { weekday: 'long' })}</span>`;
-        
-        // Handle UI nav button lock constraints checks
-        document.getElementById('prevDayBtn').disabled = (currentSliderDay === 1);
-        document.getElementById('nextDayBtn').disabled = (currentSliderDay === totalDays);
-
-        let sliderCardContent = "";
-        profiles.forEach(p => {
-            const shiftType = getShiftForDate(p, currentSliderDate);
-            let badgeClass = `badge-${shiftType.toLowerCase()}`;
-            if (["A", "B", "C"].includes(shiftType) && dailyShiftAssignments[currentSliderDay][shiftType].length > 1) {
-                badgeClass += " badge-conflict";
-            }
-            sliderCardContent += `<div class="day-card-row">
-                <span>${p.name}</span>
-                <span class="badge ${badgeClass}">${shiftType}</span>
-            </div>`;
-        });
-        sliderCardBody.innerHTML = sliderCardContent;
-
-        // 4. Update Warning boxes and general roll tally logs
+        // Warnings Block visibility handling rules
         const alertPanel = document.getElementById('conflictAlertPanel');
         const alertListDiv = document.getElementById('conflictAlertsList');
         if(conflictsList.length > 0) {
@@ -693,6 +584,7 @@
             alertListDiv.innerHTML = conflictsList.map(c => `<div style="padding:4px 0;">${c}</div>`).join('');
         } else { alertPanel.style.display = "none"; }
 
+        // Global Payroll Total Generation updates
         const summaryBody = document.getElementById('teamSummaryBody');
         summaryBody.innerHTML = "";
         Object.keys(summaryMetrics).forEach(id => {
@@ -709,16 +601,28 @@
 
     document.getElementById('editForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        const currentProf = profiles.find(p => p.id === activeProfileId);
+        const targetId = document.getElementById('editProfileSelect').value;
+        const currentProf = profiles.find(p => p.id === targetId);
         if(!currentProf) return;
+
         currentProf.name = document.getElementById('editName').value.trim();
         currentProf.anchorDate = document.getElementById('editAnchor').value;
         currentProf.pattern = document.getElementById('editPattern').value.split(',').map(s => s.trim().toUpperCase());
         currentProf.rates.A = parseInt(document.getElementById('editRateA').value) || 0;
         currentProf.rates.B = parseInt(document.getElementById('editRateB').value) || 0;
         currentProf.rates.C = parseInt(document.getElementById('editRateC').value) || 0;
-        saveState(); renderProfilesList(); renderDataView(); toggleAccordion();
+        
+        saveState(); syncProfileDropdowns(); renderDataView(); toggleAccordion();
     });
+
+    function deleteActiveProfile() {
+        if(profiles.length <= 1) return;
+        const targetId = document.getElementById('editProfileSelect').value;
+        profiles = profiles.filter(p => p.id !== targetId);
+        if(activeProfileId === targetId) activeProfileId = profiles[0].id;
+        
+        saveState(); syncProfileDropdowns(); renderDataView(); toggleAccordion();
+    }
 
     document.getElementById('profileForm').addEventListener('submit', (e) => {
         e.preventDefault();
@@ -728,19 +632,18 @@
             name: document.getElementById('profName').value.trim(),
             anchorDate: document.getElementById('profAnchor').value,
             pattern: patternArr,
-            rates: {
-                A: parseInt(document.getElementById('rateA').value) || 0,
-                B: parseInt(document.getElementById('rateB').value) || 0,
-                C: parseInt(document.getElementById('rateC').value) || 0,
-                REST: 0, OFF: 0
-            }
+            rates: { A: parseInt(document.getElementById('rateA').value) || 0, B: parseInt(document.getElementById('rateB').value) || 0, C: parseInt(document.getElementById('rateC').value) || 0, REST: 0, OFF: 0 }
         };
         profiles.push(newProfile); activeProfileId = newProfile.id;
-        saveState(); renderProfilesList(); renderDataView();
+        saveState(); syncProfileDropdowns(); renderDataView();
         document.getElementById('profileForm').reset(); toggleAccordion();
     });
 
-    renderProfilesList();
+    monthSelect.addEventListener('change', renderDataView);
+    yearSelect.addEventListener('change', renderDataView);
+    
+    // Initial Setup Bootstrapping sequence
+    syncProfileDropdowns();
     renderDataView();
 </script>
 </body>
